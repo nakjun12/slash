@@ -1,43 +1,69 @@
 {
   "compilerOptions": {
     /* Modules */
+    // 프로젝트의 기본 디렉토리를 설정합니다.
     "baseUrl": ".",
+    // 모듈 시스템을 CommonJS로 설정합니다.
     "module": "commonjs",
+    // 모듈 해석 방식을 Node.js의 새로운 방식(nodenext)으로 설정합니다.
     "moduleResolution": "nodenext",
+    // 특정 모듈에 대한 경로 별칭을 설정합니다.
     "paths": {
       "@emotion/core": ["sink.d.ts"]
     },
+    // JSON 모듈의 가져오기를 허용합니다.
     "resolveJsonModule": true,
 
     /* Type Checking */
+    // switch 문에서 case를 누락하지 않도록 검사합니다.
     "noFallthroughCasesInSwitch": true,
+    // 함수에서 모든 경로에 반환값이 있는지 확인합니다.
     "noImplicitReturns": true,
+    // 사용되지 않는 지역 변수에 대해 경고합니다.
     "noUnusedLocals": true,
+    // 사용되지 않는 매개변수에 대해 경고합니다.
     "noUnusedParameters": true,
+    // 엄격한 타입 검사를 활성화합니다.
     "strict": true,
 
     /* Language and Environment */
+    // 실험적인 데코레이터를 사용할 수 있도록 허용합니다.
     "experimentalDecorators": true,
+    // JSX를 'react-jsx' 방식으로 처리합니다.
     "jsx": "react-jsx",
+    // 컴파일에 포함될 라이브러리를 지정합니다.
     "lib": ["dom", "dom.iterable", "ESNext", "ESNext.AsyncIterable"],
+    // ECMAScript 대상 버전을 ES6로 설정합니다.
     "target": "es6",
 
     /* Interop Constraints */
+    // synthetic default imports를 허용합니다 (default export가 없는 모듈을 default import로 불러올 수 있음).
     "allowSyntheticDefaultImports": true,
+    // ES 모듈과 CommonJS 모듈 간의 상호 운용성을 허용합니다.
     "esModuleInterop": true,
+    // 파일 이름의 대소문자 일관성을 강제합니다.
     "forceConsistentCasingInFileNames": true,
 
     /* Emit */
+    // 타입 선언 파일을 생성합니다.
     "declaration": true,
+    // downlevel iteration을 활성화합니다 (구형 환경에서도 새로운 JavaScript 반복 프로토콜을 사용할 수 있게 함).
     "downlevelIteration": true,
+    // 소스 맵과 함께 인라인 소스를 포함합니다.
     "inlineSources": true,
+    // const enums를 보존합니다.
     "preserveConstEnums": true,
+    // 컴파일된 파일에서 주석을 제거하지 않습니다.
     "removeComments": false,
+    // 소스 맵을 생성합니다.
     "sourceMap": true,
 
     /* Completeness */
+    // JavaScript 파일의 처리를 허용하지 않습니다.
     "allowJs": false,
+    // 라이브러리 파일의 타입 체크를 생략합니다.
     "skipLibCheck": true
   },
+  // 컴파일 과정에서 제외할 파일이나 패턴을 지정합니다.
   "exclude": ["**/dist/*", "**/esm/*", "**/__testfixtures__/*"]
 }
