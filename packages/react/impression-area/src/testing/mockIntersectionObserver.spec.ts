@@ -28,6 +28,7 @@ describe('mockIntersectionObserver', () => {
     observer1.observe(element);
     mockIntersectionObserver.intersect(element, { ratio: 1 });
 
+    //주어진 함수가 실행할 때까지 대기한다.
     await waitFor(() => {
       expect(onIntersectionObserverStart1).toBeCalledTimes(1);
     });
@@ -50,6 +51,7 @@ describe('mockIntersectionObserver', () => {
       expect(onIntersectionObserverStart2).toBeCalledTimes(2);
     });
   });
+
   it('observer.intersect에 자식 element를 전달하면 부모 element에 등록된 핸들러들이 호출된다', async () => {
     const onIntersectionObserverStart1 = jest.fn();
     const onIntersectionObserverStart2 = jest.fn();
