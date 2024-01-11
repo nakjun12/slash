@@ -38,6 +38,7 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
+    //스터디 괜찮을듯
     act(() => {
       isError = false;
       ref.current?.reset();

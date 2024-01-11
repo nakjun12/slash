@@ -1,62 +1,59 @@
-/** @tossdocs-ignore */
-import { useIsMounted } from '@toss/react';
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef } from 'react';
 import { useKey } from './hooks';
 
+// ErrorBoundaryGroupContext를 생성합니다. 이 컨텍스트는 reset 함수와 resetKey 값을 제공합니다.
 export const ErrorBoundaryGroupContext = createContext<{ reset: () => void; resetKey: number } | undefined>(undefined);
+
+// 개발 환경에서는 컨텍스트의 이름을 설정하여 디버깅을 용이하게 합니다.
 if (process.env.NODE_ENV !== 'production') {
   ErrorBoundaryGroupContext.displayName = 'ErrorBoundaryGroupContext';
 }
 
 /**
- * @description ErrorBoundaryGroup is Component to manage multiple ErrorBoundaries
+ * ErrorBoundaryGroup 컴포넌트입니다. 여러 ErrorBoundary를 관리하는 데 사용됩니다.
+ *
+ * @param {boolean} blockOutside - 외부 ErrorBoundaryGroup의 resetKey에 의한 리셋을 방지합니다.
+ * @param {ReactNode} children - ErrorBoundaryGroup 내부에 포함될 자식 컴포넌트들입니다.
+ *
  * @example
- * ```jsx
  * <ErrorBoundaryGroup>
- *   <ErrorBoundaryGroupReset trigger={( group ) => <button onClick={group.reset} />} />
  *   <ErrorBoundary />
  *   <ErrorBoundary />
  * </ErrorBoundaryGroup>
- *
- * const ErrorBoundaryGroupReset = ({ trigger: Trigger }) => {
- *   const group = useErrorBoundaryGroup();
- *
- *   return <Trigger {...group} />;
- * };
- * ```
  */
 export const ErrorBoundaryGroup = ({
   blockOutside = false,
   children,
 }: {
-  /**
-   * @description If you use blockOutside as true, ErrorBoundaryGroup will protect multiple ErrorBoundaries as its children from external ErrorBoundaryGroup's resetKey
-   * @default false
-   */
   blockOutside?: boolean;
-  /**
-   * @description Use multiple ErrorBoundaries inside of children
-   */
   children?: ReactNode;
 }) => {
-  const blockOutsideRef = useRef(blockOutside);
-  const isMounted = useIsMounted();
-  const group = useContext(ErrorBoundaryGroupContext);
-  const [resetKey, reset] = useKey();
+  const blockOutsideRef = useRef(blockOutside); // blockOutside 값을 ref로 저장하여, 변경되지 않도록 합니다.
+  const [resetKey, reset] = useKey(); // resetKey와 reset 함수를 생성합니다.
 
   useEffect(() => {
-    if (isMounted && !blockOutsideRef.current) {
+    // 컴포넌트가 마운트되고, blockOutside가 false인 경우 reset 함수를 호출합니다.
+    if (!blockOutsideRef.current) {
       reset();
     }
-  }, [group?.resetKey, isMounted, reset]);
+  }, [reset]);
 
+  // value에는 reset 함수와 resetKey 값을 포함합니다.
   const value = useMemo(() => ({ reset, resetKey }), [reset, resetKey]);
 
+  // ErrorBoundaryGroupContext.Provider를 통해 value를 자식 컴포넌트에게 제공합니다.
   return <ErrorBoundaryGroupContext.Provider value={value}>{children}</ErrorBoundaryGroupContext.Provider>;
 };
 
 /**
- * useErrorBoundaryGroup need ErrorBoundaryGroup in parent. if no ErrorBoundaryGroup, this hook will throw Error to prevent that case.
+ * useErrorBoundaryGroup 훅은 ErrorBoundaryGroup 내부에서 사용되어야 합니다.
+ * ErrorBoundaryGroup가 없는 경우 오류를 발생시켜 잘못된 사용을 방지합니다.
+ *
+ * @returns {object} group 객체를 반환합니다. 이 객체는 ErrorBoundaryGroup의 reset 함수를 포함합니다.
+ *
+ * @example
+ * const group = useErrorBoundaryGroup();
+ * <button onClick={group.reset}>Reset ErrorBoundaries</button>
  */
 export const useErrorBoundaryGroup = () => {
   const group = useContext(ErrorBoundaryGroupContext);
@@ -65,13 +62,6 @@ export const useErrorBoundaryGroup = () => {
     throw new Error('useErrorBoundaryGroup must be used within an ErrorBoundaryGroup');
   }
 
-  return useMemo(
-    () => ({
-      /**
-       * When you want to reset multiple ErrorBoundaries as children of ErrorBoundaryGroup, You can use this reset
-       */
-      reset: group.reset,
-    }),
-    [group.reset]
-  );
+  // group 객체에는 reset 함수가 포함되어 있습니다.
+  return useMemo(() => ({ reset: group.reset }), [group.reset]);
 };
