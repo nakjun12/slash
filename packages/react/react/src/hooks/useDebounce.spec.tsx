@@ -36,7 +36,7 @@ describe('useDebounce', () => {
     result.current();
 
     jest.advanceTimersByTime(timeBeforeCompletion);
-
+    // timeBeforeCompletion 시간이 지나기 전까지는 callback이 호출되지 않는다.
     expect(callback).not.toBeCalled();
 
     jest.advanceTimersByTime(remainingTime);
@@ -76,11 +76,13 @@ describe('useDebounce', () => {
     jest.advanceTimersByTime(timeBeforeCompletion);
 
     expect(callback).not.toBeCalled();
-
+    // unmount 테스트
     unmount();
 
+    // runAllTimers는 setTimeout, setInterval, requestAnimationFrame 즉시 실행
     jest.runAllTimers();
 
+    // unmount 되었으므로 callback이 호출되지 않는다.
     expect(callback).not.toBeCalled();
   });
 });
