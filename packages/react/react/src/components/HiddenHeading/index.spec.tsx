@@ -53,3 +53,8 @@ describe('HiddenHeading', () => {
     expect(container.querySelector('h3')).toHaveStyle(defaultStyle);
   });
 });
+
+//querySelector는 CSS 선택자를 사용하여 DOM에서 특정 요소를 직접 선택할 수 있습니다.
+//이러한 방법을 사용한 이유는 실제 DOM 요소를 선택할 수 있기 때문입니다.
+
+//특정 DOM 구조나 CSS 클래스의 존재 여부를 확인하는 경우에는 querySelector가 더 직관적일 수 있습니다.

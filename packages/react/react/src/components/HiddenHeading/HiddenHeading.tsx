@@ -17,6 +17,7 @@ interface Props {
 
 /** @tossdocs-ignore */
 export function HiddenHeading({ as = 'h1', id, className, children }: Props) {
+  // 타입 캐스트를 해주어서 as가 HTMLHeadingElement로 타입 변경을 합니다
   const Heading = as as unknown as ComponentType<HTMLAttributes<HTMLHeadingElement>>;
 
   return (
