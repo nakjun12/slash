@@ -15,3 +15,6 @@ export function useCallbackOnce<F extends (...args: any[]) => void>(callback: F,
 
   return memoizedCallback;
 }
+
+//useCallback을 써준 이유는 메모이제이션을 통해 재생성을 막기 위함이고,
+//deps를 준 이유는 callback을 사용하는 조건이 변함을 감지하기 위함이다
