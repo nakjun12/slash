@@ -5,25 +5,32 @@ import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { ImpressionAreaProps } from './ImpressionArea';
 
+// ImpressionAreaProps 타입에서 필요한 프로퍼티만 선택하여 Options 타입을 정의합니다.
 type Options = Pick<
   ImpressionAreaProps,
   'rootMargin' | 'onImpressionStart' | 'onImpressionEnd' | 'timeThreshold' | 'areaThreshold' | 'root'
 >;
 
+// useImpressionRef 훅을 정의합니다. 이 훅은 HTMLElement의 제네릭 타입을 받아들이며, Options 타입의 파라미터를 받습니다.
 export function useImpressionRef<Element extends HTMLElement>({
-  onImpressionStart: _onImpressionStart,
-  onImpressionEnd: _onImpressionEnd,
-  timeThreshold = 0,
-  root,
-  rootMargin,
-  areaThreshold: intersectThreshold = 0,
+  onImpressionStart: _onImpressionStart, // 인상 시작 시 호출될 콜백 함수
+  onImpressionEnd: _onImpressionEnd, // 인상 종료 시 호출될 콜백 함수
+  timeThreshold = 0, // 인상을 결정하기 위한 최소 시간 임계값
+  root, // IntersectionObserver의 루트 요소
+  rootMargin, // IntersectionObserver의 rootMargin 설정
+  areaThreshold: intersectThreshold = 0, // 요소가 교차하는 영역의 비율 임계값
 }: Options) {
+  // 콜백 함수들을 저장하고, 없을 경우 noop (아무 작업도 하지 않는 함수)를 사용합니다.
   const onImpressionStart = usePreservedCallback(_onImpressionStart ?? noop);
   const onImpressionEnd = usePreservedCallback(_onImpressionEnd ?? noop);
 
+  // 요소가 교차하는지 여부를 추적하기 위한 ref를 생성합니다.
   const isIntersectingRef = useRef(false);
+
+  // 인상 상태를 지연시켜 설정하는 함수입니다. 지연 시간은 timeThreshold에 의해 결정됩니다.
   const setDebouncedIsImpressed = useSetDebouncedBooleanValue({
     onValueChange: isImpressed => {
+      // 교차 상태가 true로 변경되면 onImpressionStart를 호출하고, false로 변경되면 onImpressionEnd를 호출합니다.
       if (isImpressed) {
         onImpressionStart();
       } else {
@@ -33,12 +40,15 @@ export function useImpressionRef<Element extends HTMLElement>({
     timeThreshold,
   });
 
+  // IntersectionObserver를 사용하여 요소의 교차 상태를 감지합니다. 감지되면 setDebouncedIsImpressed를 호출합니다.
   const intersectionObserverRef = useIntersectionObserver<Element>(
     ({ isIntersecting }) => {
+      // 문서가 비활성화 상태일 때는 교차 상태를 업데이트하지 않습니다.
       if (document.visibilityState === 'hidden') {
         return;
       }
 
+      // 교차 상태를 업데이트하고, debounce를 적용하여 onImpressionStart 또는 onImpressionEnd를 호출합니다.
       isIntersectingRef.current = isIntersecting;
       setDebouncedIsImpressed(isIntersecting);
     },
@@ -49,7 +59,9 @@ export function useImpressionRef<Element extends HTMLElement>({
     }
   );
 
+  // 문서의 가시성이 변경될 때마다 교차 상태를 업데이트합니다.
   useDocumentVisibilityChange(documentVisible => {
+    // 현재 교차 상태가 true이고 문서가 가시적일 때만 setDebouncedIsImpressed를 호출합니다.
     if (!isIntersectingRef.current) {
       return;
     }
@@ -57,6 +69,7 @@ export function useImpressionRef<Element extends HTMLElement>({
     setDebouncedIsImpressed(documentVisible);
   });
 
+  // 생성된 IntersectionObserver의 참조를 반환합니다. 이 참조는 감지하려는 요소에 연결되어야 합니다.
   return intersectionObserverRef;
 }
 
@@ -114,7 +127,7 @@ function useIntersectionObserver<Element extends HTMLElement>(
 function useSetDebouncedBooleanValue(options: { onValueChange: (newValue: boolean) => void; timeThreshold: number }) {
   const { onValueChange, timeThreshold } = options;
   const handleValueChange = usePreservedCallback(onValueChange);
-  const ref = useRef({ value: false, cancelPrevDebounce: () => { } });
+  const ref = useRef({ value: false, cancelPrevDebounce: () => {} });
 
   const setDebouncedValue = useCallback(
     (newValue: boolean) => {
